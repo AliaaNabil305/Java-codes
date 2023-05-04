@@ -1,0 +1,74 @@
+import java.util.*;
+public class KnightTour {
+    private static int[][] board = new int[8][8];
+    private static int size = 8;
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter the starting row number: ");
+        int startX = sc.nextInt();
+        System.out.print("Enter the starting column number: ");
+        int startY = sc.nextInt();
+        board[startX][startY] = 1;
+        if (solve(startX, startY, 2, startX, startY)) {
+            printBoard();
+        } else {
+            System.out.println("No closed tour found.");
+        }
+    }
+    private static boolean solve(int x, int y, int count, int startX, int startY) {
+        if (count > size * size) {
+            if (isClosedTour(x, y, startX, startY)) {
+                return true;
+            }
+            return false;
+        }
+        List<int[]> nextMoves = getNextMoves(x, y);
+        Collections.sort(nextMoves, (a, b) -> getNextMoves(a[0], a[1]).size() -
+                getNextMoves(b[0], b[1]).size());
+        for (int[] move : nextMoves) {
+            int nextX = move[0];
+            int nextY = move[1];
+            if (board[nextX][nextY] == 0) {
+                board[nextX][nextY] = count;
+                if (solve(nextX, nextY, count + 1, startX, startY)) {
+                    return true;
+                }
+                board[nextX][nextY] = 0;
+            }
+        }
+        return false;
+
+    }
+    private static List<int[]> getNextMoves(int x, int y) {
+        int[][] moves = { { 1, 2 }, { 2, 1 }, { -1, 2 }, { -2, 1 }, { 1, -2 }, { 2, -
+                1 }, { -1, -2 }, { -2, -1 } };
+        List<int[]> nextMoves = new ArrayList<>();
+        for (int[] move : moves) {
+            int nextX = x + move[0];
+            int nextY = y + move[1];
+            if (nextX >= 0 && nextX < size && nextY >= 0 && nextY < size) {
+                nextMoves.add(new int[] { nextX, nextY });
+            }
+        }
+        return nextMoves;
+    }
+    private static boolean isClosedTour(int x, int y, int startX, int startY) {
+        List<int[]> nextMoves = getNextMoves(x, y);
+        for (int[] move : nextMoves) {
+            int nextX = move[0];
+            int nextY = move[1];
+            if (nextX == startX && nextY == startY) {
+                return true;
+            }
+        }
+        return false;
+    }
+    private static void printBoard() {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                System.out.print(board[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+}
